@@ -1,0 +1,64 @@
+<mat-sidenav-container class="dashboard-container">
+    <mat-sidenav mode="side" opened class="sidenav">
+      <div class="logo-container">
+        <h1 class="logo-text">TRAE</h1>
+        <img src="../../assets/Logo.webp" alt="Logo" class="logo">
+      </div>
+      
+      <mat-nav-list>
+        <a mat-list-item *ngFor="let item of menuItems" [routerLink]="item.route" routerLinkActive="active">
+          <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
+          <span matListItemTitle>{{item.label}}</span>
+        </a>
+      </mat-nav-list>
+    </mat-sidenav>
+  
+    <mat-sidenav-content>
+      <mat-toolbar color="primary">
+        <span>Dashboard</span>
+        <span class="toolbar-spacer"></span>
+        <button mat-icon-button>
+          <mat-icon>notifications</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon>account_circle</mat-icon>
+        </button>
+      </mat-toolbar>
+  
+      <div class="dashboard-content">
+        <div class="stats-cards">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>Total Donations</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <h2>€24,500</h2>
+              <p>+12% from last month</p>
+            </mat-card-content>
+          </mat-card>
+  
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>Active Donors</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <h2>156</h2>
+              <p>+8 new this month</p>
+            </mat-card-content>
+          </mat-card>
+  
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>Projects Funded</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <h2>12</h2>
+              <p>3 in progress</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+  
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
