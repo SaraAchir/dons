@@ -1,30 +1,25 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-
+import { MaterialModule } from '../shared/material.module';
 import { DashboardComponent } from './dashboard.component';
+import { DonorsComponent } from './components/donors/donors.component';
 
 @NgModule({
-  declarations: [DashboardComponent],
+  declarations: [
+    DashboardComponent,
+    DonorsComponent
+  ],
   imports: [
     CommonModule,
-    RouterModule,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    MatCardModule,
+    MaterialModule,
     RouterModule.forChild([
       {
         path: '',
-        component: DashboardComponent
+        component: DashboardComponent,
+        children: [
+          { path: 'donors', component: DonorsComponent }
+        ]
       }
     ])
   ]

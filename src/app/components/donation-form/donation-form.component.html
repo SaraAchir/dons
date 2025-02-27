@@ -6,7 +6,7 @@
       </mat-card-header>
   
       <mat-card-content>
-        <form [formGroup]="donationForm" (ngSubmit)="onSubmit()">
+        <form [formGroup]="donationForm" >
           <div class="donation-type-section">
             <h3>Choose your donation type</h3>
             <mat-button-toggle-group formControlName="donationType">
@@ -128,7 +128,7 @@
               <input matInput formControlName="country">
             </mat-form-field>
           </div>
-  
+<!--   
           <div class="additional-options">
             <mat-checkbox formControlName="taxReceipt">
               I would like to receive a tax receipt
@@ -137,15 +137,17 @@
             <mat-checkbox formControlName="acceptTerms" class="terms-checkbox">
               I accept the terms and conditions
             </mat-checkbox>
-          </div>
-          <div class="payment-section" *ngIf="donationForm.valid">
+          </div> -->
+          <div class="payment-section">
             <h3>Payment Method</h3>
-            <div id="paypal-button"></div>
+            <!-- <div id="paypal-button"></div> -->
           </div>
           <button mat-raised-button color="primary" 
         class="submit-button" 
-        type="submit"
-        [disabled]="!donationForm.valid">
+        (click)="onProceedToPayment()"
+        
+        
+        [disabled]="!donationForm.valid || getTotalAmount() <= 0">
   Proceed to Payment
 </button>
           <!-- <button mat-raised-button color="primary" 

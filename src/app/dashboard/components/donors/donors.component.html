@@ -1,0 +1,44 @@
+<div class="donors-container">
+  <h2>Donors List</h2>
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Search donors..." #input>
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+  
+  <!-- Keep only one table, remove any duplicate -->
+  <mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+      <mat-cell *matCellDef="let donor"> {{donor.firstName}} {{donor.lastName}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
+      <mat-cell *matCellDef="let donor"> {{donor.email}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="totalDonated">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Total Donated </mat-header-cell>
+      <mat-cell *matCellDef="let donor"> €{{donor.totalDonated}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="lastDonationDate">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Last Donation </mat-header-cell>
+      <mat-cell *matCellDef="let donor"> {{donor.lastDonationDate | date}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="donationType">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Type </mat-header-cell>
+      <mat-cell *matCellDef="let donor"> {{donor.donationType}} </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 25]"
+                 showFirstLastButtons
+                 aria-label="Select page">
+  </mat-paginator>
+</div>

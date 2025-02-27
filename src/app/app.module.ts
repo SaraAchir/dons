@@ -26,6 +26,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
+import { PaypalDialogComponent } from './components/paypal-dialog/paypal-dialog.component';
 
 
 @NgModule({
@@ -33,7 +35,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     AppComponent,
     DonationListComponent,
     DonationFormComponent,
-    DonorListComponent
+    DonorListComponent,
+    PaypalDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -57,7 +60,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatExpansionModule,
     MatCheckboxModule,
     FormsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   providers: [
     provideClientHydration(withEventReplay()),

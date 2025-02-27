@@ -1,0 +1,31 @@
+.donors-container {
+    padding: 20px;
+    .search-field {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    
+    .mat-mdc-form-field {
+      font-size: 14px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+  
+    table {
+      width: 100%;
+      
+      th {
+        font-weight: 600;
+        color: #2e7d32;
+      }
+  
+      td {
+        &.mat-column-totalDonated {
+          color: #2e7d32;
+          font-weight: 500;
+        }
+      }
+    }
+  }
