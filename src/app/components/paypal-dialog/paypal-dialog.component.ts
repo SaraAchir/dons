@@ -22,6 +22,7 @@ export class PaypalDialogComponent implements AfterViewInit {
   }
 
   async initializePayPal() {
+    console.log('initializePaypal paypal dialog',this.data)
     try {
       const subscription = this.paypalService.paymentStatus.subscribe(status => {
         if (status.success) {

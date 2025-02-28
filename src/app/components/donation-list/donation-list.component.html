@@ -1,1 +1,59 @@
-<p>donation-list works!</p>
+<div class="donations-history">
+    <h2>My Donations History</h2>
+  
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Monthly" #input>
+    </mat-form-field>
+  
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort>
+        
+        <ng-container matColumnDef="created_at">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+          <td mat-cell *matCellDef="let row"> {{row.created_at | date}} </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="donation_type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+          <td mat-cell *matCellDef="let row"> {{row.donation_type | titlecase}} </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="frequency">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Frequency </th>
+          <td mat-cell *matCellDef="let row"> {{row.frequency || 'N/A' | titlecase}} </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="total_amount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+          <td mat-cell *matCellDef="let row"> €{{row.total_amount}} </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="payment_status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-chip-listbox>
+                <mat-chip [color]="row.payment_status ? 'primary' : 'warn'" selected>
+                  {{row.payment_status ? 'Completed' : 'Pending'}}
+                </mat-chip>
+              </mat-chip-listbox>
+            </td>
+          </ng-container>
+          
+  
+        <ng-container matColumnDef="details">
+          <th mat-header-cell *matHeaderCellDef> Details </th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button (click)="openDetails(row)">
+              <mat-icon>info</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+  
+      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of donations"></mat-paginator>
+    </div>
+  </div>

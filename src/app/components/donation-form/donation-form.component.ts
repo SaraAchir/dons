@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PaypalDialogComponent } from '../paypal-dialog/paypal-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { DonationApiService } from '../../services/donation-api.service';
 
 interface CauseState {
   isSelected: boolean;
@@ -28,7 +29,7 @@ export class DonationFormComponent implements OnInit ,OnDestroy{
   ];
   frequencies = [
     { value: 'monthly', label: 'Monthly' },
-    { value: 'annuel', label: 'Annuel' }
+    { value: 'yearly', label: 'Yearly' }
   
   ];
 
@@ -36,58 +37,58 @@ export class DonationFormComponent implements OnInit ,OnDestroy{
     {
       category: 'Association Support',
       options: [
-        { id: 'annual-membership', name: 'Annual membership (starting from 15€)', amount: 15 },
-        { id: 'support-association', name: 'Support the association', amount: 0 }
+        { id: '3', name: 'Annual membership (starting from 15€)', amount: 15 },
+        { id: '4', name: 'Support the association', amount: 0 }
       ]
     },
     {
       category: 'Ramadan',
       options: [
-        { id: 'food-basket', name: 'Offer a special Ramadan food basket to Moroccan families (30€)', amount: 30 },
-        { id: 'ramadan-pack', name: 'Ramadan pack (250€ per pack for Nepal + 5 fruit trees + 3 food baskets)', amount: 250 },
-        { id: 'iftar-morocco', name: 'Iftar Morocco (any amount)', amount: 0 }
+        { id: '5', name: 'Offer a special Ramadan food basket to Moroccan families (30€)', amount: 30 },
+        { id: '6', name: 'Ramadan pack (250€ per pack for Nepal + 5 fruit trees + 3 food baskets)', amount: 250 },
+        { id: '7', name: 'Iftar Morocco (any amount)', amount: 0 }
       ]
     },
     {
       category: 'Help Orphans',
       options: [
-        { id: 'sponsor-orphan', name: 'Sponsor a Moroccan orphan (20€ monthly)', amount: 20 },
-        { id: 'widows-orphans', name: 'Fund for Moroccan widows and orphans', amount: 0 },
-        { id: 'orphanage-construction', name: 'Participate in orphanage construction in Morocco', amount: 0 }
+        { id: '8', name: 'Sponsor a Moroccan orphan (20€ monthly)', amount: 20 },
+        { id: '9', name: 'Fund for Moroccan widows and orphans', amount: 0 },
+        { id: '10', name: 'Participate in orphanage construction in Morocco', amount: 0 }
       ]
     },
     {
       category: 'Well Construction for a Family',
       options: [
-        { id: 'well-nepal', name: 'In Nepal (160€)', amount: 160 },
-        { id: 'well-bangladesh', name: 'In Bangladesh (165€)', amount: 165 },
-        { id: 'well-srilanka', name: 'In Sri Lanka (185€)', amount: 185 },
-        { id: 'well-burma', name: 'In Burma (215€)', amount: 215 }
+        { id: '11', name: 'Well Construction for a Family In Nepal (160€)', amount: 160 },
+        { id: '12', name: 'Well Construction for a Family In Bangladesh (165€)', amount: 165 },
+        { id: '13', name: ' Well Construction for a FamilyIn Sri Lanka (185€)', amount: 185 },
+        { id: '14', name: ' Well Construction for a Family In Burma (215€)', amount: 215 }
       ]
     },
     {
       category: 'Well Construction for a Village',
       options: [
-        { id: 'village-well-niger', name: 'In Niger (750€ + 16€ transaction fee)', amount: 766 },
-        { id: 'village-well-bangladesh', name: 'In Bangladesh (771€ + 11€ transaction fee)', amount: 782 },
-        { id: 'village-well-cameroon', name: 'In Cameroon (1520€ + 20€ transaction fee)', amount: 1540 }
+        { id: '15', name: ' Well Construction for a Village In Niger (750€ + 16€ transaction fee)', amount: 766 },
+        { id: '16', name: ' Well Construction for a Village In Bangladesh (771€ + 11€ transaction fee)', amount: 782 },
+        { id: '17', name: 'Well Construction for a Village In Cameroon (1520€ + 20€ transaction fee)', amount: 1540 }
       ]
     },
     {
       category: 'Other Causes',
       options: [
-        { id: 'medical-emergencies', name: 'Support medical emergencies in Morocco', amount: 0 },
-        { id: 'social-hospitals', name: 'Support for patients in social hospitals', amount: 0 }
+        { id: '18', name: 'Support medical emergencies in Morocco', amount: 0 },
+        { id: '19', name: 'Support for patients in social hospitals', amount: 0 }
       ]
     }
   ];
  
   selectedCauses: { [key: string]: CauseState } = {};
 
+  causes: any[] = [];
 
 
-
-  constructor(private fb: FormBuilder,private paypalService: PaypalService, private snackBar: MatSnackBar,private dialog: MatDialog) {
+  constructor(private fb: FormBuilder,private paypalService: PaypalService, private snackBar: MatSnackBar,private dialog: MatDialog, private donationApiService: DonationApiService,) {
     this.initForm();
     this.initSelectedCauses();
     
@@ -95,12 +96,31 @@ export class DonationFormComponent implements OnInit ,OnDestroy{
   async onProceedToPayment() {
         console.log(this.donationForm.value);
         const totalAmount = this.getTotalAmount();
-        const selectedCausesList = Object.entries(this.selectedCauses || {})
-        .filter(([_, cause]) => cause?.isSelected)
-        .map(([id, cause]) => ({
-          name: this.getCauseName(id),
-          amount: cause?.amount
-        }));
+        // const selectedCausesList = Object.entries(this.selectedCauses || {})
+        // .filter(([_, cause]) => cause?.isSelected)
+        // .map(([id, cause]) => ({
+        //   // name: this.getCauseName(id),
+        //   cause: parseInt(id),
+        //   amount: cause?.amount,
+        //   quantity: 1
+          
+        // }));
+        const donationData = {
+          firstName: this.donationForm.get('firstName')?.value,
+          email: this.donationForm.get('email')?.value,
+          donationType: this.donationForm.get('donationType')?.value,
+          frequency: this.donationForm.get('frequency')?.value,
+          total_amount: this.getTotalAmount(),
+          details: Object.entries(this.selectedCauses || {})
+            .filter(([_, cause]) => cause?.isSelected)
+            .map(([id, cause]) => ({
+              cause: parseInt(id),
+              name : this.getCauseName(id),
+              amount: cause.amount,
+              quantity: 1
+            }))
+        };
+        console.log('Donation data donation form component:', donationData);
         if (this.donationForm.valid && totalAmount > 0) {
       const dialogRef = this.dialog.open(PaypalDialogComponent, {
         width: '500px',
@@ -108,18 +128,13 @@ export class DonationFormComponent implements OnInit ,OnDestroy{
         data: {
           amount: this.getTotalAmount(),
           userEmail: this.donationForm.get('email')?.value,
-          donationDetails: {
-            firstName: this.donationForm.get('firstName')?.value,
-            email: this.donationForm.get('email')?.value,
-            donationType: this.donationForm.get('donationType')?.value,
-            frequency: this.donationForm.get('frequency')?.value,
-            causes: selectedCausesList
-          }
+          donationDetails: donationData
         }
       });
 
       dialogRef.afterClosed().subscribe(result => {
         if (result?.success) {
+          console.log('Payment successful, donation saved');
           // Handle successful payment
           this.resetForm();
         }
@@ -201,6 +216,7 @@ export class DonationFormComponent implements OnInit ,OnDestroy{
     }
   }
   ngOnInit() {
+    this.loadCauses();
     this.categories.forEach(category => {
       category.options.forEach(option => {
         this.selectedCauses[option.id] = {
@@ -224,6 +240,16 @@ export class DonationFormComponent implements OnInit ,OnDestroy{
             panelClass: ['error-snackbar']
           });
         }
+      }
+    );
+  }
+  loadCauses() {
+    this.donationApiService.getCauses().subscribe(
+      (data) => {
+        this.causes = data;
+      },
+      (error) => {
+        console.error('Error loading causes:', error);
       }
     );
   }
@@ -318,6 +344,8 @@ async initializePayPal() {
     donationDetails.frequency = this.donationForm.get('frequency')?.value;
   }
   try {
+    console.log('savoir les causes',donationDetails.causes)
+
     await this.paypalService.iniiitPayPalButton(
       totalAmount, 
       '#paypal-button',

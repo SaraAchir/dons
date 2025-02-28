@@ -1,0 +1,40 @@
+.donation-info {
+    margin-bottom: 20px;
+    
+    p {
+      margin: 8px 0;
+      
+      strong {
+        color: #666;
+        min-width: 100px;
+        display: inline-block;
+      }
+    }
+  }
+  
+  .causes-list {
+    h3 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+  
+    mat-list-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+  
+      .cause-name {
+        flex: 1;
+      }
+  
+      .cause-amount {
+        color: #2196F3;
+        font-weight: 500;
+      }
+    }
+  }
+  
+  mat-dialog-actions {
+    margin-top: 20px;
+  }

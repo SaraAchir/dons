@@ -4,3 +4,4 @@
 /.angular
 .env
 *.log
+/src/index.html

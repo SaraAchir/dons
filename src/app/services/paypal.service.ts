@@ -16,6 +16,8 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { EmailService } from './email.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DonationApiService } from './donation-api.service';
+import { Router } from '@angular/router';
 interface PayPalButtonConfig {
   style: {
     layout: string;
@@ -66,7 +68,11 @@ export class PaypalService {
 
   constructor(
     private emailService: EmailService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private donationApiService: DonationApiService,
+    private router: Router,
+
+
   ) {}
 
   private handleError(error: any): PaymentError {
@@ -116,145 +122,6 @@ export class PaypalService {
     return errorDetails;
   }
 
-  initPayPalButton(amount: number, containerId: string, userEmail: string, donationDetails: { frequency: FrequencyType; [key: string]: any }): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        // @ts-ignore
-        paypal.Buttons({
-          style: {
-            layout: 'vertical'
-          },
-          createOrder: (data: any, actions: any) => {
-            if (donationDetails['donationType'] === 'regular') {
-              try {
-                return actions?.subscription?.create({
-                  plan_id: SUBSCRIPTION_PLANS[donationDetails?.frequency],
-                  application_context: {
-                    shipping_preference: 'NO_SHIPPING'
-                  }
-                }).catch((error: any) => {
-                  this.handleError('Failed to create subscription: ' + error.message);
-                  reject(error);
-                });
-              } catch (error) {
-                this.handleError('Subscription creation error');
-                reject(error);
-              }
-            } else {
-              try {
-                return actions.order.create({
-                  intent: 'CAPTURE',
-                  purchase_units: [{
-                    amount: {
-                      value: amount.toString(),
-                      currency_code: 'EUR'
-                    },
-                    description: 'One-time donation'
-                  }]
-                }).catch((error: any) => {
-                  this.handleError('Failed to create order: ' + error.message);
-                  reject(error);
-                });
-              } catch (error) {
-                this.handleError('Order creation error');
-                reject(error);
-              }
-            }
-          },
-
-          onApprove: async (data: any, actions: any) => {
-            try {
-              if (donationDetails['donationType'] === 'regular')  {
-                
-                const subscription = await actions.subscription.get();
-                console.log('Subscription Success:', subscription);
-                
-                this.paymentStatus.next({
-                  success: true,
-                  orderId: subscription.id
-                });
-
-                await this.emailService.sendConfirmationEmail(userEmail, {
-                  ...donationDetails,
-                  subscriptionId: subscription.id,
-                  isRecurring: true,
-                  frequency: donationDetails.frequency
-                }).catch(error => {
-                  console.error('Email sending failed:', error);
-                  this.snackBar.open('Payment successful but email confirmation failed', 'Close', {
-                    duration: 5000
-                  });
-                });
-
-                resolve();
-              } else {
-                const order = await actions.order.capture();
-                console.log('One-time Payment Success:', order);
-                
-                this.paymentStatus.next({
-                  success: true,
-                  orderId: order.id
-                });
-
-                await this.emailService.sendConfirmationEmail(userEmail, {
-                  ...donationDetails,
-                  orderId: order.id,
-                  isRecurring: false
-                }).catch(error => {
-                  console.error('Email sending failed:', error);
-                  this.snackBar.open('Payment successful but email confirmation failed', 'Close', {
-                    duration: 5000
-                  });
-                });
-
-                resolve();
-              }
-            } catch (error) {
-              this.handleError(error);
-              reject(error);
-            }
-          },
-
-          onError: (err: any) => {
-            const errorDetails = this.handleError(err);
-            console.error('PayPal Error Details:', {
-              code: errorDetails.code,
-              message: errorDetails.message,
-              raw: err
-            });
-            reject(errorDetails);
-          },
-
-          onCancel: (data: any) => {
-            const cancelError = {
-              code: 'PAYMENT_CANCELLED',
-              message: 'Payment was cancelled by the user',
-              details: data
-            };
-            this.handleError(cancelError);
-            reject(cancelError);
-          }
-        }).render(containerId)
-        .catch((renderError: any) => {
-          const error = {
-            code: 'RENDER_FAILED',
-            message: 'Failed to load PayPal button',
-            details: renderError
-          };
-          this.handleError(error);
-          reject(error);
-        });
-      } catch (error) {
-        const initError = {
-          code: 'INITIALIZATION_FAILED',
-          message: 'Failed to initialize PayPal',
-          details: error
-        };
-        this.handleError(initError);
-        reject(initError);
-      }
-    });
-  }
 
 
 
@@ -272,68 +139,7 @@ export class PaypalService {
 
   
   
-  iniitPayPalButton(amount: number, containerId: string, userEmail: string, donationDetails: any): Promise<void> {
-      return new Promise((resolve, reject) => {
-        try {
-          const buttonConfig: PayPalButtonConfig = {
-            style: {
-              layout: 'vertical'
-            },
-            onApprove: async (data: any, actions: any) => {
-              try {
-                if (donationDetails.donationType === 'regular') {
-                  console.log('Subscription Success:', data);
-                  this.paymentStatus.next({
-                    success: true,
-                    orderId: data.subscriptionID
-                  });
-                } else {
-                  const order = await actions.order.capture();
-                  console.log('Payment Success:', order);
-                  this.paymentStatus.next({
-                    success: true,
-                    orderId: order.id
-                  });
-                }
-                resolve();
-              } catch (error) {
-                console.error('Payment Error:', error);
-                reject(error);
-              }
-            }
-          };
-  
-          if (donationDetails.donationType === 'regular') {
-            buttonConfig.createSubscription = (data: any, actions: any) => {
-              return actions.subscription.create({
-                'plan_id': SUBSCRIPTION_PLANS[donationDetails.frequency],
-                'application_context': {
-                  'shipping_preference': 'NO_SHIPPING',
-                  'user_action': 'SUBSCRIBE_NOW'
-                }
-              });
-            };
-          } else {
-            buttonConfig.createOrder = (data: any, actions: any) => {
-              return actions.order.create({
-                purchase_units: [{
-                  amount: {
-                    value: amount.toString(),
-                    currency_code: 'EUR'
-                  }
-                }]
-              });
-            };
-          }
-  
-          // @ts-ignore
-          paypal.Buttons(buttonConfig).render(containerId);
-        } catch (error) {
-          console.error('Render Error:', error);
-          reject(error);
-        }
-      });
-    }
+ 
 
     iniiitPayPalButton(amount: number, containerId: string, userEmail: string, donationDetails: any): Promise<void> {
       return new Promise((resolve, reject) => {
@@ -346,11 +152,31 @@ export class PaypalService {
               try {
                 if (donationDetails.donationType === 'regular') {
                   console.log('Subscription Success:', data);
+                    // Ensure causes exist and create donation data
+      const donationData = {
+        first_name: donationDetails.firstName || '',
+        email: donationDetails.email || '',
+        donation_type: donationDetails.donationType || 'regular',
+        frequency: donationDetails.frequency,
+        total_amount: amount.toString(),
+        payment_id: data.subscriptionID,
+        payment_status: true,
+        details: donationDetails.details ? donationDetails.details.map((cause: { id: any; name: any; amount: any; quantity: any;cause:any }) => ({
+          cause:  parseInt(cause.cause),
+          amount: cause.amount.toString(),
+          quantity: cause.quantity || 1,
+        })) : []
+      };
+
+      console.log('Saving donation:', donationData);
+      
+      await this.donationApiService.createDonation(donationData).toPromise();
+                
                   this.paymentStatus.next({
                     success: true,
                     orderId: data.subscriptionID
                   });
-    
+                
                   // Send confirmation email for subscription
                   await this.emailService.sendConfirmationEmail(userEmail, {
                     ...donationDetails,
@@ -371,6 +197,27 @@ export class PaypalService {
                 } else {
                   const order = await actions.order.capture();
                   console.log('Payment Success:', order);
+                  
+      const donationData = {
+        first_name: donationDetails.firstName || '',
+        email: donationDetails.email || '',
+        donation_type: donationDetails.donationType || 'one-time',
+        total_amount: amount.toString(),
+        payment_id: order.id,
+        payment_status: true,
+        details: donationDetails.details ? donationDetails.details.map((cause: { id: any; name: any; amount: any; quantity: any;description : any;cause :any }) => ({
+          cause:  parseInt(cause.cause),
+          amount: cause.amount.toString(),
+          quantity: cause.quantity || 1,
+          
+        })) : []
+      };
+
+      console.log('Saving donation:', donationData);
+      
+      await this.donationApiService.createDonation(donationData).toPromise();
+
+                
                   this.paymentStatus.next({
                     success: true,
                     orderId: order.id
@@ -393,6 +240,7 @@ export class PaypalService {
                     panelClass: ['success-snackbar']
                   });
                 }
+                this.router.navigate(['/donations']);
                 resolve();
               } catch (error) {
                 console.error('Payment Error:', error);

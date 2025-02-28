@@ -28,6 +28,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PaypalDialogComponent } from './components/paypal-dialog/paypal-dialog.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { DonationDetailsDialogComponent } from './components/donation-details-dialog/donation-details-dialog.component';
+
 
 
 @NgModule({
@@ -36,7 +41,8 @@ import { PaypalDialogComponent } from './components/paypal-dialog/paypal-dialog.
     DonationListComponent,
     DonationFormComponent,
     DonorListComponent,
-    PaypalDialogComponent
+    PaypalDialogComponent,
+    DonationDetailsDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -61,7 +67,12 @@ import { PaypalDialogComponent } from './components/paypal-dialog/paypal-dialog.
     MatCheckboxModule,
     FormsModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    MatChipsModule,
+    MatPaginatorModule,
+    MatSortModule,
+  
+   
   ],
   providers: [
     provideClientHydration(withEventReplay()),

@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Donation Details</h2>
+<mat-dialog-content>
+    <div class="donation-info">
+      <p><strong>Donor:</strong> {{data.first_name}}</p>
+      <p><strong>Email:</strong> {{data.email}}</p>
+    </div>
+
+    <div class="causes-list" *ngIf="data.details?.length" >
+      <h3>Donated Causes</h3>
+      <mat-list>
+        <mat-list-item *ngFor="let detail of data.details">
+          <div class="cause-details">
+            <span class="cause-name">{{detail.cause_name}}</span>
+            <div class="cause-info">
+              <span class="cause-quantity" *ngIf="detail.quantity > 1">x{{detail.quantity}}</span>
+              <span class="cause-amount">€{{detail.amount}}</span>
+            </div>
+          </div>
+        </mat-list-item>
+      </mat-list>
+      <div class="total-section">
+        <strong>Total Amount:</strong>
+        <span class="total-amount">€{{data.total_amount}}</span>
+      </div>
+    </div>
+  </mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">Close</button>
+</mat-dialog-actions>
